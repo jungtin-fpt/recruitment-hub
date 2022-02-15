@@ -20,7 +20,6 @@ const { performance } = require('perf_hooks');
 		page = await search(page, 'java');
 		const totalPage = await getTotalPageNumber(page);
 		const jobs = await crawlAllJobs(page, totalPage);
-		console.log(jobs);
 		for (let i = 0; i < jobs.length; i++) {
 			const job = jobs[i];
 			page = await goto(browser, job.url, page);

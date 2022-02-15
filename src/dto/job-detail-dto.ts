@@ -1,7 +1,7 @@
-import { Company } from './company';
-import { Job } from './job';
+import { Company } from './company-dto';
+import { JobDTO } from './job-dto';
 
-export class JobDetail extends Job {
+export class JobDetailDTO extends JobDTO {
 	constructor(
 		url: string,
 		title: string,
