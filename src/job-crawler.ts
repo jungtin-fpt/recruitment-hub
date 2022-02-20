@@ -119,18 +119,17 @@ export async function crawlAllJobs(page: Page, totalPage?: number): Promise<JobD
 			const jobInfos = await Promise.all(
 				jobs.map(async (job) => {
 					const jobInfo = await job.evaluate((el) => {
-						const titleEl = el.querySelector('h3.title');
-						const url =
-							(titleEl?.querySelector('a.underline-box-job') as HTMLElement).getAttribute('href') ||
-							'';
-						const title =
-							(titleEl?.querySelector('span.transform-job-title') as HTMLElement).getAttribute(
-								'data-original-title'
-							) || '';
+						const wrapperEl = el.querySelector('h3.title');
+						const urlEl = wrapperEl?.querySelector('a.underline-box-job');
+						const titleEl = wrapperEl?.querySelector('span.transform-job-title');
+
+						const url = urlEl ? urlEl.getAttribute('href') : '';
+						const title = titleEl ? titleEl.getAttribute('data-original-title') : '';
+						
 						// return new Job(url, title);
 						return { url, title } as JobDTO;
 					});
-					// logger.info(jobInfo);
+					logger.info(jobInfo);
 					return jobInfo;
 				})
 			);

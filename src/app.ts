@@ -1,20 +1,25 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 import express from 'express';
 import config from './config';
+import { createConnection, getManager } from 'typeorm';
 
-// const express = require('express');
-// const config = require('./config');
+createConnection().then((connection) => {
+	console.log(connection.isConnected);
+	getManager(connection.name).transaction(e => {
+		return Promise.resolve();
+	})
 
-const app = express();
-/* Middleware */
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+	const app = express();
+	/* Middleware */
+	app.use(express.urlencoded({ extended: false }));
+	app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-	res.json({ message: 'Xin chào' });
-});
+	app.get('/', (req: Request, res: Response) => {
+		res.json({ message: 'Xin chào' });
+	});
 
-app.listen(config.port, () => {
-	console.log(`Server is running on PORT: ${config.port}`);
+	app.listen(config.port, () => {
+		console.log(`Server is running on PORT: ${config.port}`);
+	});
 });
