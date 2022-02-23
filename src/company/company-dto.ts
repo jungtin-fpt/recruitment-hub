@@ -1,4 +1,4 @@
-export class Company {
+export class CompanyDTO {
 	constructor(
 		public url: string,
 		public name: string,
