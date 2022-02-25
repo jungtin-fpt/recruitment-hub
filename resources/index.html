@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible"
+              content="IE=edge">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0">
+        <title>Recruitement Hub</title>
+    </head>
+
+    <body>
+        <h1>Xin chào</h1>
+
+        <script>
+            if (!!window.EventSource) {
+                const source = new EventSource('/events');
+                source.addEventListener('message', function (e) {
+                    console.log(`message: ${e.data}`);
+                }, false)
+
+                source.addEventListener('topcv-event', function (e) {
+                    try {
+                        const { type, level, data } = JSON.parse(e.data)
+                        const message = type === 'object' ? JSON.parse(data) : data;
+                        switch(level) {
+                            case 'info':
+                                console.info(message);
+                                break;
+                            case 'warn':
+                                console.warn(message);
+                                break;
+                            case 'error':
+                                console.error(message);
+                                break;
+                            default:
+                                break;
+                        }
+                        
+                    } catch(err) {
+                        console.error('Fail to parse message from [TOPCV] server', err);
+                    }
+                }, false)
+
+                source.addEventListener('open', function (e) {
+                    console.log('Open');
+                }, false)
+
+                source.addEventListener('error', function (e) {
+                    const id_state = document.getElementById('state')
+                    if (e.eventPhase == EventSource.CLOSED)
+                        source.close();
+                    
+                    if (e.target.readyState == EventSource.CLOSED) {
+                        console.log('Disconnected');
+                    } else if (e.target.readyState == EventSource.CONNECTING) {
+                        console.log('Connecting');
+                    }
+                }, false)
+            } else {
+                console.error(`Your browser doesn't supports SSE(server-sent event)`);
+                alert(`Your browser doesn't supports SSE(server-sent event)`);
+            }
+        </script>
+    </body>
+
+</html>

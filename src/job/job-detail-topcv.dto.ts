@@ -1,13 +1,12 @@
-import e from 'express';
-import { CompanyDTO } from '../company/company-dto';
+import { CompanyDTO } from '../company/company.dto';
 import logger from '../logger';
 import { removeSpecialCharacter, removeVNAccent } from '../util/formatter';
-import { JobDetailDTO } from './job-detail-dto';
-import { LEVEL } from './level';
-import { Salary } from './salary-dto';
-import { WORK_METHOD } from './work-method';
+import { JobDetailDTO } from './job-detail.dto';
+import { LEVEL } from './utils/level';
+import { Salary } from './utils/salary';
+import { WORK_METHOD } from './utils/work-method';
 
-export class JobDetailRawTopCvDTO {
+export class JobDetailTopCvDTO {
 	constructor(
 		public url: string,
 		public title: string,

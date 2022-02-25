@@ -1,6 +1,6 @@
-import { CompanyDTO } from '../company/company-dto';
-import { LEVEL } from './level';
-import { WORK_METHOD } from './work-method';
+import { CompanyDTO } from '../company/company.dto';
+import { LEVEL } from './utils/level';
+import { WORK_METHOD } from './utils/work-method';
 
 export class JobDetailDTO {
 	constructor(

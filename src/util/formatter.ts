@@ -1,6 +1,13 @@
-export function removeSpecialCharacter(content: string, replaceWith: string) {
+export function removeSpecialCharacter(text: string, replaceWith: string) {
     // return content.replace(/[^a-zA-Z0-9]+/gi, replaceWith);
-    return content.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, replaceWith);
+    return text.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, replaceWith);
+}
+
+export function removeExtraSpaceAndBreakline(text: string) {
+    text = text.replace(/(\r\n|\n|\r|\t|\•)/gm, "");
+    text = text.replace(/ + /g," ");
+    text = text.trim();
+    return text;
 }
 
 export function removeVNAccent(text: string) {
