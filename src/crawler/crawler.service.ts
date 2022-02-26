@@ -5,6 +5,7 @@ import { createSection, updateSectionStatus } from '../section/section.service';
 import { synchronizeSkills } from '../skill-suggestor/skill.service';
 import AbstractCrawler from './crawler.abstract';
 import TopCVCrawler from './topcv.crawler';
+import DefaultEmitter from '../emitter/default-emitter';
 
 export const topCvCrawler = new TopCVCrawler();
 /* 
@@ -12,7 +13,11 @@ export const topCvCrawler = new TopCVCrawler();
 */
 export let crawlers: AbstractCrawler[] = [topCvCrawler];
 export let numOfFinishedJob = 0;
+
+export let isAvailable = false;
+
 export async function startCrawling(keyword: string) {
+	isAvailable = false;
 	const section = await createSection(keyword);
 	for (const crawler of crawlers) {
 		crawler
@@ -34,7 +39,10 @@ export async function startCrawling(keyword: string) {
 			.finally(() => {
 				if (++numOfFinishedJob >= crawlers.length) {
 					numOfFinishedJob = 0;
+					isAvailable = true;
 					updateSectionStatus(section.id, SECTION_STATE.COMPLETED);
+					DefaultEmitter.log('info', `Crawling process of keyword: ${keyword} has been completed`);
+					DefaultEmitter.status(isAvailable);
 				}
 			});
 	}

@@ -4,14 +4,15 @@ import path from 'path';
 import { createConnection } from 'typeorm';
 import config from './config';
 import crawlerRouter from './crawler/crawler.route';
-import { topCvCrawler } from './crawler/crawler.service';
+import { topCvCrawler as TopCvCrawler, isAvailable } from './crawler/crawler.service';
 import logger from './logger';
-import { EmitterLogger } from './logger/emitter-logger.types';
+import { EmitterLogger } from './emitter/emitter-logger.types';
 import camelCaseMiddleware from './middlewares/camelcase.middleware';
 import omitEmptyMiddleware from './middlewares/omit-empty.middleware';
 import sectionRouter from './section/section.route';
 import skillRouter from './skill-suggestor/skill.route';
 import analyzeRouter from './analyze/analyze.route';
+import DefaultEmitter from './emitter/default-emitter';
 
 const app = express();
 /* Middleware */
@@ -27,14 +28,23 @@ app.use('/sections', sectionRouter);
 app.get('/events', sse(), (req: Request, res: any) => {
 	const resp = res as ISseResponse;
 	console.log('SSE event has been opened');
+	resp.sse.event('status', isAvailable);
 
-	topCvCrawler.on('log', (data: EmitterLogger) => {
+	TopCvCrawler.on('log', (data: EmitterLogger) => {
 		resp.sse.event('topcv-event', data);
-	})
+	});
+
+	DefaultEmitter.on('log', (data: EmitterLogger) => {
+		resp.sse.event('default', data);
+	});
+
+	DefaultEmitter.on('status', (isAvailable: boolean) => {
+		resp.sse.event('status', isAvailable);
+	});
 
 	resp.on('close', () => {
 		console.log('SSE event has been closed');
-	})
+	});
 	/* 
 		Chúng ta nên chủ động res.end() để tránh conflict
 		- Custom event room: resp.sse.event('custom-event', 'data sent to custom event');

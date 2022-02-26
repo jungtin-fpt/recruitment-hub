@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { JobDetailDTO } from '../job/job-detail.dto';
 import logger from '../logger';
-import { EmitterLogger } from '../logger/emitter-logger.types';
+import { EmitterLogger } from '../emitter/emitter-logger.types';
 
 abstract class AbstractCrawler extends EventEmitter {
 	abstract crawl(
