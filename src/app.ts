@@ -1,17 +1,17 @@
-import sse, { ISseFunctions, ISseResponse } from '@toverux/expresse';
-import { ISseHandlerResponse } from '@toverux/expresse/dist/src/sse_handler_middleware';
-import EventEmitter from 'events';
+import sse, { ISseResponse } from '@toverux/expresse';
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { createConnection } from 'typeorm';
 import config from './config';
 import crawlerRouter from './crawler/crawler.route';
+import { topCvCrawler } from './crawler/crawler.service';
 import logger from './logger';
+import { EmitterLogger } from './logger/emitter-logger.types';
 import camelCaseMiddleware from './middlewares/camelcase.middleware';
 import omitEmptyMiddleware from './middlewares/omit-empty.middleware';
+import sectionRouter from './section/section.route';
 import skillRouter from './skill-suggestor/skill.route';
-import { topCvCrawler } from './crawler/crawler.service';
-import { EmitterLogger } from './logger/emitter-logger.types';
+import analyzeRouter from './analyze/analyze.route';
 
 const app = express();
 /* Middleware */
@@ -22,6 +22,7 @@ app.use(omitEmptyMiddleware());
 
 app.use('/skills', skillRouter);
 app.use('/crawler', crawlerRouter);
+app.use('/sections', sectionRouter);
 
 app.get('/events', sse(), (req: Request, res: any) => {
 	const resp = res as ISseResponse;
@@ -44,6 +45,8 @@ app.get('/events', sse(), (req: Request, res: any) => {
 app.get('/', (req: Request, res: Response) => {
 	res.sendFile(path.join(__dirname, '..', 'resources', 'index.html'));
 });
+
+app.use('/analyze', analyzeRouter);
 
 createConnection().then((connection) => {
 	logger.info(`Database Connecting: ${connection.isConnected}`);

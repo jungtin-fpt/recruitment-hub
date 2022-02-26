@@ -4,7 +4,7 @@ import { getSkillById, getSkills, updateSkillOmit, updateSkillVerification } fro
 export const getSkillsController = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const body = req.body;
-        const skills = await getSkills({ isOmit: body.isOmit, isVerified: body.isVerified });
+        const skills = await getSkills(body.isOmit, body.isVerified );
         res.json(skills);
     } catch(err) {
         next(err);

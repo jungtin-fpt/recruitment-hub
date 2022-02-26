@@ -7,8 +7,8 @@ abstract class AbstractCrawler extends EventEmitter {
 	abstract crawl(
 		keyword: string,
 		headless: boolean,
-		baseUrl: string,
-		searchUrl: string
+		baseUrl?: string,
+		searchUrl?: string
 	): Promise<JobDetailDTO[]>;
 
 	log(level: 'info' | 'warn' | 'error', data: string | object, omitSystemLogger?: boolean) {

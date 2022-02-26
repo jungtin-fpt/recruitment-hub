@@ -1,3 +1,4 @@
+import { FindOneOptions } from 'typeorm';
 import { Section } from '../entity/Section';
 import { EntityNotFoundError } from '../error/entity-not-found.error';
 import { SECTION_STATE } from '../job/utils/section-state';
@@ -17,8 +18,8 @@ export async function updateSectionStatus(id: number, state: SECTION_STATE) {
 	return await section.save();
 }
 
-export async function getSectionById(id: number) {
-	const section = await Section.findOne(id);
+export async function getSectionById(id: number, options?: FindOneOptions<Section>) {
+	const section = await Section.findOne(id, options);
 	if (!section) throw new EntityNotFoundError('section', id);
 
 	return section;

@@ -13,7 +13,7 @@ router.get(
 	'/',
 	[
 		body('status')
-			.isEmpty()
+			.notEmpty()
 			.withMessage('must be specified')
 			.isIn([SECTION_STATE.PROCESSING, SECTION_STATE.STOPPED, SECTION_STATE.COMPLETED])
 			.withMessage('value must in (processing | stopped | completed)'),
@@ -24,7 +24,7 @@ router.get(
 
 router.get(
 	'/:id',
-	[param('id').isEmpty().withMessage('must be specified').isInt().withMessage('must be number')],
+	[param('id').notEmpty().withMessage('must be specified').isInt().withMessage('must be number')],
 	validationMiddleware,
 	getSectionController
 );
@@ -32,9 +32,9 @@ router.get(
 router.patch(
 	'/:id',
 	[
-		param('id').isEmpty().withMessage('must be specified').isInt().withMessage('must be number'),
+		param('id').notEmpty().withMessage('must be specified').isInt().withMessage('must be number'),
 		body('status')
-			.isEmpty()
+			.notEmpty()
 			.withMessage('must be specified')
 			.isIn([SECTION_STATE.PROCESSING, SECTION_STATE.STOPPED, SECTION_STATE.COMPLETED])
 			.withMessage('value must in (processing | stopped | completed)'),

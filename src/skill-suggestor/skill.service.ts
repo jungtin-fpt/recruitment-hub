@@ -19,13 +19,11 @@ export async function updateSkillOmit(id: number, isOmit: boolean) {
 	await skill.save();
 }
 
-export async function getSkills(
-	condition: { isOmit: boolean; isVerified: boolean }
-) {
+export async function getSkills(isOmit?: boolean, isVerified?: boolean) {
 	return await Skill.find({
 		where: {
-			isOmit: condition.isOmit || false,
-			isVerified: condition.isOmit || false,
+			isOmit: isOmit || false,
+			isVerified: isVerified || false,
 		},
 	});
 }
