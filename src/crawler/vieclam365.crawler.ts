@@ -171,7 +171,7 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 					nextPageEl = await pagination.$('a:last-child');
 					if (!nextPageEl) throw new Error('Không tìm thấy next page');
 
-					isNextPage = !(await nextPageEl.evaluate((el) => (el.classList.contains(' next') || el.classList.contains(' last'))));
+					isNextPage = !(await nextPageEl.evaluate((el) => (!(el.classList.contains(' next') && el.classList.contains(' last')))));
 				}
 
 				if (isNextPage && nextPageEl) await nextPageEl.click();
@@ -183,6 +183,103 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			logger.error(err);
 			this.log('error', `TimViec365 Crawler - Fail to crawl all jobs`, true);
 			throw new Error(`TimViec365 Crawler - Fail to crawl all jobs`);
+		}
+	}
+
+	async crawlJobDetail(keyword: string,page: Page, job: JobOverallDTO): Promise<JobDetailDTO> {
+		try {
+			await page.waitForSelector('div.box_tit_detail');
+			const companyLink =
+				(await page.$eval('div.left_tit a.ct_com', (el) =>
+					(el as HTMLElement).getAttribute('href')
+				)) || '';
+			const region = await page.$eval('p.dd_tuyen a', (el) => (el as HTMLElement).innerText);
+			const workAddress = await page.$eval(
+				'div.right_tit p:nth-child(6) span',
+				(el) => (el as HTMLElement).innerText
+			);
+			const salary = await page.$eval(
+					'div.right_tit_2 p.lv_luong span',
+					(el) => (el as HTMLElement).innerText
+				);
+			const level = await page.$eval(
+				'div.box_tomtat_2 p:first-child span',
+				(el) => (el as HTMLElement).innerText
+			);
+			const workMethod = await page.$eval(
+				'div.box_tomtat_2 p:nth-child(3) span',
+				(el) => (el as HTMLElement).innerText
+			);
+			// const skills = await page.$$eval('div.skill span', (els) => {
+			// 	return (els as HTMLElement[])
+			// 		.filter((el) => {
+			// 			return !!el.querySelector('a')?.innerText;
+			// 		})
+			// 		.map((el) => {
+			// 			return el.querySelector('a')?.innerText || '';
+			// 		});
+			// });
+			const skills: string[] = [keyword];
+			const descriptionTmp1 = await page.$eval(
+				'div.box_yeucau',
+				(el) => (el as HTMLElement).innerText
+			);
+			//const descriptionTmp2 = descriptionTmp1.split('\n');			
+			const description =
+				(await page.$$eval('div.job-data h3', (els) => {
+					const el = (els as HTMLElement[]).filter(
+						(title) => title.innerText === 'Yêu cầu ứng viên'
+					)[0];
+					const contentTabEl = el.nextElementSibling;
+					const items = contentTabEl?.querySelectorAll('ul li');
+					const paragraphItems = contentTabEl?.querySelectorAll('p');
+					let description = '';
+					items?.forEach((item) => {
+						description += ` ${item.textContent} `;
+					});
+					paragraphItems?.forEach((item) => {
+						description += ` ${item.textContent} `;
+					});
+					return description;
+				})) || '';
+			const requiredExp =
+				(await page.$$eval('div.box-item div strong', (els) => {
+					const el = (els as HTMLElement[]).filter((title) => title.innerText === 'Kinh nghiệm')[0];
+					return el.parentNode?.querySelector('span')?.innerText;
+				})) || '';
+
+			// console.log(`Job title: ${job.title}`);
+			// console.log(`Job link: ${job.url}`);
+			// console.log(`Company link: ${companyLink}`);
+			// console.log(`Raw region: ${rawRegion}`);
+			// console.log(`Work address: ${workAddress}`);
+			// console.log(`Raw salary: ${rawSalary}`);
+			// console.log(`Level: ${rawLevel}`);
+			// console.log(`Work method: ${rawWorkMethod}`);
+			// console.log(`Skills: ${skills.length}`);
+			// skills.forEach(skill => {
+			// 	console.log(skill);
+			// })
+			// console.log(`Description: ${description}`);
+			const company = await this.crawlCompany(page, companyLink);
+			const jobDetailRaw = new JobDetailViecLam365DTO(
+				job.url,
+				job.title,
+				description,
+				region,
+				salary,
+				workMethod,
+				workAddress,
+				level,
+				skills,
+				company,
+				requiredExp
+			);
+			return jobDetailRaw.reformat();
+		} catch (err) {
+			logger.error(err);
+			this.log('error', `TopCV Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`, true);
+			throw new Error(`TopCV Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
 		}
 	}
 }
