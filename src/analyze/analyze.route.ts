@@ -4,7 +4,7 @@ import validationMiddleware from '../middlewares/validator.middleware';
 import { analyzeController } from './analyze.controller';
 const router = express.Router();
 
-router.get(
+router.post(
 	'/',
 	[
 		body('sectionId').notEmpty().withMessage('must be specify').isInt().withMessage('must be integer'),

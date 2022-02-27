@@ -14,6 +14,7 @@ import skillRouter from './skill-suggestor/skill.route';
 import analyzeRouter from './analyze/analyze.route';
 import DefaultEmitter from './emitter/default-emitter';
 
+process.setMaxListeners(0);
 const app = express();
 /* Middleware */
 app.use(express.urlencoded({ extended: false }));
@@ -21,10 +22,14 @@ app.use(express.json());
 app.use(camelCaseMiddleware());
 app.use(omitEmptyMiddleware());
 
+app.get('/', (req: Request, res: Response) => {
+	res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+});
+app.use('/static', express.static(path.resolve(__dirname, '../dist')));
 app.use('/skills', skillRouter);
 app.use('/crawler', crawlerRouter);
 app.use('/sections', sectionRouter);
-
+app.use('/analyze', analyzeRouter);
 app.get('/events', sse(), (req: Request, res: any) => {
 	const resp = res as ISseResponse;
 	console.log('SSE event has been opened');
@@ -44,6 +49,8 @@ app.get('/events', sse(), (req: Request, res: any) => {
 
 	resp.on('close', () => {
 		console.log('SSE event has been closed');
+		// TopCvCrawler.removeAllListeners();
+		// DefaultEmitter.removeAllListeners();
 	});
 	/* 
 		Chúng ta nên chủ động res.end() để tránh conflict
@@ -51,12 +58,6 @@ app.get('/events', sse(), (req: Request, res: any) => {
 		- Default event room: resp.sse.data('data');
 	*/
 });
-
-app.get('/', (req: Request, res: Response) => {
-	res.sendFile(path.join(__dirname, '..', 'resources', 'index.html'));
-});
-
-app.use('/analyze', analyzeRouter);
 
 createConnection().then((connection) => {
 	logger.info(`Database Connecting: ${connection.isConnected}`);

@@ -13,8 +13,7 @@ router.get(
 	'/',
 	[
 		body('status')
-			.notEmpty()
-			.withMessage('must be specified')
+			.optional()
 			.isIn([SECTION_STATE.PROCESSING, SECTION_STATE.STOPPED, SECTION_STATE.COMPLETED])
 			.withMessage('value must in (processing | stopped | completed)'),
 	],

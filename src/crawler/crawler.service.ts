@@ -14,10 +14,12 @@ export const topCvCrawler = new TopCVCrawler();
 export let crawlers: AbstractCrawler[] = [topCvCrawler];
 export let numOfFinishedJob = 0;
 
-export let isAvailable = false;
+export let isAvailable = true;
 
 export async function startCrawling(keyword: string) {
 	isAvailable = false;
+	DefaultEmitter.log('info', `Crawling process of keyword: ${keyword} is starting`);
+	DefaultEmitter.status(isAvailable);
 	const section = await createSection(keyword);
 	for (const crawler of crawlers) {
 		crawler
@@ -36,11 +38,11 @@ export async function startCrawling(keyword: string) {
 				logger.error(err);
 				crawler.log('error', `Process can't be finish due to error happen`);
 			})
-			.finally(() => {
+			.finally(async () => {
 				if (++numOfFinishedJob >= crawlers.length) {
 					numOfFinishedJob = 0;
 					isAvailable = true;
-					updateSectionStatus(section.id, SECTION_STATE.COMPLETED);
+					await updateSectionStatus(section.id, SECTION_STATE.COMPLETED);
 					DefaultEmitter.log('info', `Crawling process of keyword: ${keyword} has been completed`);
 					DefaultEmitter.status(isAvailable);
 				}

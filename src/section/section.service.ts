@@ -1,4 +1,5 @@
 import { FindOneOptions } from 'typeorm';
+import { Job } from '../entity/Job';
 import { Section } from '../entity/Section';
 import { EntityNotFoundError } from '../error/entity-not-found.error';
 import { SECTION_STATE } from '../job/utils/section-state';
@@ -26,10 +27,24 @@ export async function getSectionById(id: number, options?: FindOneOptions<Sectio
 }
 
 export async function getSections(status: SECTION_STATE) {
+	const option = !!status ? {
+		status,
+	} : {} ;
 	const sections = await Section.find({
-		where: {
-			status
+		order: {
+			createdAt: 'DESC'
 		},
+		where: option,
+		take: 15
 	});
-	return sections;
+	return await Promise.all(sections.map(async section => {
+		return {
+			...section,
+			jobs: await Job.count({
+				where: {
+					section
+				}
+			})
+		}
+	}));
 }
