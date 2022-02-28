@@ -56,13 +56,17 @@ function normalizeRegion(region: string) {
 
 function formatWorkMethod(workMethod: string): WORK_METHOD {
     switch(workMethod) {
-        case 'Toàn thời gian':
+        case 'Toàn thời gian cố định':
+            return WORK_METHOD.FULL_TIME;
+        case 'Toàn thời gian tạm thời':
             return WORK_METHOD.FULL_TIME;
         case 'Bán thời gian':
             return WORK_METHOD.PART_TIME;
-        case 'Thực tập':
+        case 'Bán thời gian tạm thời':
+            return WORK_METHOD.PART_TIME;
+        case 'Hợp đồng':
             return WORK_METHOD.INTERN;
-        case 'Remote - Làm việc từ xa':
+        case 'Việc làm từ xa':
             return WORK_METHOD.REMOTE;
         default:
             throw new Error(`Some work method may not been updated yet, please take a look(${workMethod})`);
@@ -73,19 +77,21 @@ function formatLevel(level: string): LEVEL {
     switch(level) {
         case 'Thực tập sinh':
             return LEVEL.INTERN;
+        case 'Mới Tốt Nghiệp':
+            return LEVEL.INTERN;
         case 'Nhân viên':
             return LEVEL.STAFF;
+        case 'Trưởng Phòng':
+            return LEVEL.HEAD;
         case 'Trưởng nhóm':
             return LEVEL.HEAD;
-        case 'Trưởng/Phó phòng':
+        case 'Phó phòng':
             return LEVEL.HEAD;
-        case 'Trưởng chi nhánh':
-            return LEVEL.HEAD;
-        case 'Quản lý / Giám sát':
+        case 'Quản lý cấp cao':
             return LEVEL.MANAGER;
-        case 'Phó giám đốc':
-            return LEVEL.PRESIDENT;
-        case 'Giám đốc':
+        case 'Quản lý cấp trung':
+            return LEVEL.MANAGER;
+        case 'Giám Đốc':
             return LEVEL.PRESIDENT;
         default:
             throw new Error(`Some job's level may not been updated yet, please take a look(${level})`);
