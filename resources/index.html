@@ -169,6 +169,34 @@
             </div>
         </section>
 
+        <section id="suggestion">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="h1 mb-4 mt-5 text-success">Skill Suggestion Management</h2>
+                        <div class="form-group mb-3">
+                            <label for="suggestion-status__selector"><b>Status</b></label>
+                            <select id="suggestion-status__selector">
+                                <option value="verification-required">Verification Required</option>
+                                <option value="omitted">Omitted</option>
+                                <option value="verified">Verified</option>
+                            </select>
+                          </div>
+                        <table class="table table-primary table-hover mb-5"
+                               id="suggestion__table">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Appear Times(count)</th>
+                                <th>Verify</th>
+                                <th>Omit</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Toast -->
         <div class="toast-container"
              id="toast-container">
@@ -301,7 +329,6 @@
                 </div>
             </div>
         </div>
-        <div id="elementH"></div>
     </body>
 
 </html>

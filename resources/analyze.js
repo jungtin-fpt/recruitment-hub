@@ -60,7 +60,6 @@ export async function analyze(e) {
 		insertToRowToTable(levelTableEl, levelMap);
 		insertToRowToTable(salaryTableEl, salaryStateMap);
 		insertToRowToTable(skillTableEl, skillMap);
-		insertToRowToTable(salaryTableEl, salaryStateMap);
 		insertToRowToTable(suggestedSkillTableEl, suggestedSkillMap);
 		insertToRowToTable(workMethodTableEl, workMethodMap);
 

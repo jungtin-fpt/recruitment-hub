@@ -4,7 +4,7 @@ import validationMiddleware from '../middlewares/validator.middleware';
 import { getSkillController, getSkillsController, updateSkillController } from './skill.controller';
 
 const router = express.Router();
-router.get(
+router.post(
 	'/',
 	[
 		body('isOmit').optional().isBoolean().withMessage('must be boolean'),

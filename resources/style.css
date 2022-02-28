@@ -83,6 +83,11 @@ body {
 	background: rgb(29, 30, 30);
 }
 
+/* Suggestion Section */
+#history {
+	background: rgb(29, 30, 30);
+}
+
 /* Toast */
 #toast-container {
 	position: fixed;

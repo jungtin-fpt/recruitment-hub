@@ -34,6 +34,8 @@ export const suggestedSkillChartEl = document.getElementById('suggestedSkillChar
 export const salaryChartEl = document.getElementById('salaryChart');
 export const levelChartEl = document.getElementById('levelChart');
 export const workMethodChartEl = document.getElementById('workMethodChart');
+export const suggestionStatusSelectorEl = document.getElementById('suggestion-status__selector');
+export const suggestionTableEl = document.getElementById('suggestion__table');
 
 /* Events */
 crawlBtnEl.addEventListener('click', async (e) => {
@@ -54,6 +56,10 @@ crawlBtnEl.addEventListener('click', async (e) => {
 });
 
 $(document).on('click', '.analyze__btn', analyze);
+$(document).on('click', '.suggestion-verify__btn', { isVerifying: true }, verifySuggestion);
+$(document).on('click', '.suggestion-unverify__btn', { isVerifying: false }, verifySuggestion);
+$(document).on('click', '.suggestion-omit__btn', { isOmit: true }, omitSuggestion);
+$(document).on('click', '.suggestion-unomit__btn', { isOmit: false }, omitSuggestion);
 
 exportPdfBtn.addEventListener('click', (e) => {
 	html2pdf()
@@ -63,6 +69,112 @@ exportPdfBtn.addEventListener('click', (e) => {
 		.from(exportPdfContainer)
 		.save();
 });
+
+suggestionStatusSelectorEl.addEventListener('change', (e) => {
+	switch (suggestionStatusSelectorEl.value) {
+		case 'verification-required':
+			loadSuggestions(suggestionTableEl, { isVerified: false, isOmit: false });
+			break;
+		case 'omitted':
+			loadSuggestions(suggestionTableEl, { isOmit: true });
+			break;
+		case 'verified':
+			loadSuggestions(suggestionTableEl, { isVerified: true });
+			break;
+		default:
+			break;
+	}
+});
+
+async function verifySuggestion(e) {
+	const id = e.target.getAttribute('data-id');
+	e.target.disabled = true;
+	if (e.data.isVerifying) {
+		e.target.classList.remove('suggestion-verify__btn');
+		e.target.classList.add('suggestion-unverify__btn');
+		e.target.classList.remove('btn-success');
+		e.target.classList.add('btn-outline-danger');
+		e.target.innerText = 'Un-verify';
+	} else {
+		e.target.classList.remove('suggestion-unverify__btn');
+		e.target.classList.add('suggestion-verify__btn');
+		e.target.classList.remove('btn-outline-danger');
+		e.target.classList.add('btn-success');
+		e.target.innerText = 'Verify';
+	}
+
+	try {
+		await axios.patch(`/skills/${id}`, {
+			method: 'verify',
+			value: e.data.isVerifying
+		});
+		e.target.disabled = false;
+	} catch (err) {
+		console.error(err);
+		showToast(toastContainerEl, 'Đã có lỗi xảy ra khi thực hiện suggestion verification', 'danger');
+	}
+}
+
+async function omitSuggestion(e) {
+	const id = e.target.getAttribute('data-id');
+	e.target.disabled = true;
+	if (e.data.isOmit) {
+		e.target.classList.remove('suggestion-omit__btn');
+		e.target.classList.add('suggestion-unomit__btn');
+		e.target.classList.remove('btn-warning');
+		e.target.classList.add('btn-outline-danger');
+		e.target.innerText = 'Un-omit';
+	} else {
+		e.target.classList.remove('suggestion-unomit__btn');
+		e.target.classList.add('suggestion-omit__btn');
+		e.target.classList.remove('btn-outline-danger');
+		e.target.classList.add('btn-warning');
+		e.target.innerText = 'Omit';
+	}
+
+	try {
+		await axios.patch(`/skills/${id}`, {
+			method: 'omit',
+			value: e.data.isOmit
+		});
+		e.target.disabled = false;
+	} catch (err) {
+		console.error(err);
+		showToast(toastContainerEl, 'Đã có lỗi xảy ra khi thực hiện suggestion omit', 'danger');
+	}
+}
+
+async function loadSuggestions(tableEl, status) {
+	tableEl.querySelectorAll('.suggestion-data-row').forEach((elem) => elem.remove());
+	try {
+		const skills = (await axios.post('/skills', status)).data;
+		skills.forEach((skill) => {
+			const verificationBtn = !skill.isVerified
+				? `<td><button class='btn btn-success btn-sm suggestion-verify__btn' data-id='${skill.id}'>Verify</button></td>`
+				: `<td><button class='btn btn-outline-danger btn-sm suggestion-unverify__btn' data-id='${skill.id}'>Un-verify</button></td>`;
+
+			const omitBtn = !skill.isOmit
+				? `<td><button class='btn btn-warning btn-sm suggestion-omit__btn' data-id='${skill.id}'>Omit</button></td>`
+				: `<td><button class='btn btn-outline-danger btn-sm suggestion-unomit__btn' data-id='${skill.id}'>Un-omit</button></td>`;
+
+			tableEl.insertAdjacentHTML(
+				'beforeend',
+				`<tr data-id='${skill.id}' class='suggestion-data-row'>
+				<td>${skill.id}</td>
+				<td>${skill.name}</td>
+				<td>${skill.suggests}</td>
+				${verificationBtn}
+				${omitBtn}
+			</tr>`
+			);
+		});
+
+		showToast(toastContainerEl, 'Đã tải thành công danh sách suggestions', 'success');
+	} catch (err) {
+		console.error(err);
+		showToast(toastContainerEl, 'Đã có lỗi xảy ra khi load suggestions', 'danger');
+	}
+}
 
 /* Event Source */
 if (!!window.EventSource) {
@@ -132,6 +244,7 @@ if (!!window.EventSource) {
 		'secondary'
 	);
 	await loadSections();
+	await loadSuggestions(suggestionTableEl, { isVerified: false, isOmit: false });
 })();
 
 function crawlerEventFunction(loggerContainer) {
