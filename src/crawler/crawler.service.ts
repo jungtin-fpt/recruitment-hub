@@ -13,13 +13,12 @@ export const Vieclam365 = new Vieclam365Crawler();
 /* 
 	Mỗi một crawler sẽ sử dụng theo crawler.then().catch()
 */
-export let crawlers: AbstractCrawler[] = [Vieclam365];
+export let crawlers: AbstractCrawler[] = [topCvCrawler,Vieclam365];
 export let numOfFinishedJob = 0;
 
 export let isAvailable = true;
 
 export async function startCrawling(keyword: string) {
-	//await Vieclam365.crawl(keyword, false);
 	isAvailable = false;
 	DefaultEmitter.log('info', `Crawling process of keyword: ${keyword} is starting`);
 	DefaultEmitter.status(isAvailable);

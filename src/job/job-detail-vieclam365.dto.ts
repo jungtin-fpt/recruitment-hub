@@ -142,7 +142,7 @@ function convertToVND(amount: string, isRange: boolean, exchangeRate: number): {
     let regex, m;
     amount = amount.replace(/\,/gi, '');
 	if (isRange)
-		regex = /(\d+)-(\d+)/gm;
+		regex = /(\d+) - (\d+)/gm;
 	else
         regex = /(\d+)/gm;
 
@@ -181,7 +181,7 @@ function getSalaryRange(salary: string): SalaryRange {
 	else result.format = 'none';
 
 	/* Get Range */
-	if (salary.includes('-')) result.isRange = true;
+	if (salary.includes(' - ')) result.isRange = true;
 	else result.isRange = false;
 
 	return result;
@@ -189,7 +189,7 @@ function getSalaryRange(salary: string): SalaryRange {
 
 
 // (async () => {
-// 	const a = formatSalary('20-45 triệu');
+// 	const a = formatSalary('20 - 45 triệu');
 //     console.log(a);
 //     console.log(a.isSalaryNotSet);
 // })();

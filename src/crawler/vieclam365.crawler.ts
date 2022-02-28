@@ -255,22 +255,22 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 				companyLink = 'https://timviec365.vn' + companyLinkTmp;
 			}
 			const region = await page.$eval('p.dd_tuyen a', (el) => (el as HTMLElement).innerText);
-			const workAddress = await page.$eval(
+			const workAddress = (await page.$eval(
 				'div.right_tit p:nth-child(6) span',
 				(el) => (el as HTMLElement).innerText
-			);
-			const salary = await page.$eval(
+			)) || '';
+			const salary = (await page.$eval(
 					'div.right_tit_2 p.lv_luong span',
 					(el) => (el as HTMLElement).innerText
-				);
-			const level = await page.$eval(
+				)) || '';
+			const level = (await page.$eval(
 				'div.box_tomtat_2 p:first-child span',
 				(el) => (el as HTMLElement).innerText
-			);
-			const workMethod = await page.$eval(
+			)) || '';
+			const workMethod = (await page.$eval(
 				'div.box_tomtat_2 p:nth-child(3) span',
 				(el) => (el as HTMLElement).innerText
-			);
+			)) || '';
 			// const skills = await page.$$eval('div.skill span', (els) => {
 			// 	return (els as HTMLElement[])
 			// 		.filter((el) => {
@@ -281,10 +281,10 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			// 		});
 			// });
 			const skills: string[] = [keyword];
-			const description = await page.$eval(
+			const description = (await page.$eval(
 				'div.box_yeucau',
 				(el) => (el as HTMLElement).innerText
-			);
+			)) || '';
 			
 			//const descriptionTmp2 = descriptionTmp1.split('\n');			
 			// const description =
@@ -305,10 +305,10 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			// 		return description;
 			// 	})) || '';
 			const requiredExp =
-						await page.$eval(
+						(await page.$eval(
 							'div.box_tomtat_2 p:nth-child(2) span',
 							(el) => (el as HTMLElement).innerText
-						) || '';
+						)) || '';
 
 			// console.log(`Job title: ${job.title}`);
 			// console.log(`Job link: ${job.url}`);
