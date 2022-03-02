@@ -9,14 +9,16 @@ import DefaultEmitter from '../emitter/default-emitter';
 import TopCVCrawler from './topcv.crawler';
 import TopDevCrawler from './topdev.crawler';
 import Vieclam365Crawler from './vieclam365.crawler';
+import CareerBuilderCrawler from './careerbuilder.crawler';
 /* 
 	Mỗi một crawler sẽ sử dụng theo crawler.then().catch()
 */
 export const topCvCrawler = new TopCVCrawler();
 export const topDevCrawler = new TopDevCrawler();
 export const vieclam365Crawler = new Vieclam365Crawler();
+export const careerBuilderCrawler = new CareerBuilderCrawler();
 
-export let crawlers: AbstractCrawler[] = [topCvCrawler, vieclam365Crawler, topDevCrawler];
+export let crawlers: AbstractCrawler[] = [topCvCrawler, vieclam365Crawler, topDevCrawler, careerBuilderCrawler];
 export let numOfFinishedJob = 0;
 
 export let isAvailable = true;
