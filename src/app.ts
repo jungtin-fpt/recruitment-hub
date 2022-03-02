@@ -4,7 +4,12 @@ import path from 'path';
 import { createConnection } from 'typeorm';
 import config from './config';
 import crawlerRouter from './crawler/crawler.route';
-import { topCvCrawler as TopCvCrawler, topDevCrawler as TopDevCrawler, isAvailable } from './crawler/crawler.service';
+import {
+	topCvCrawler as TopCvCrawler,
+	vieclam365Crawler as Vieclam365Crawler,
+  topDevCrawler as TopDevCrawler,
+	isAvailable,
+} from './crawler/crawler.service';
 import logger from './logger';
 import { EmitterLogger } from './emitter/emitter-logger.types';
 import camelCaseMiddleware from './middlewares/camelcase.middleware';
@@ -41,6 +46,10 @@ app.get('/events', sse(), (req: Request, res: any) => {
 
 	TopDevCrawler.on('log', (data: EmitterLogger) => {
 		resp.sse.event('topdev-event', data);
+  });
+
+  Vieclam365Crawler.on('log', (data: EmitterLogger) => {
+		resp.sse.event('vieclam365-event', data);
 	});
 
 	DefaultEmitter.on('log', (data: EmitterLogger) => {

@@ -143,10 +143,11 @@ function convertChartData(map) {
 }
 
 function insertToRowToTable(tableEl, object) {
+	tableEl.querySelectorAll('.analyze-data-row').forEach((elem) => elem.remove());
 	for (const [key, value] of Object.entries(object)) {
 		tableEl.insertAdjacentHTML(
 			'beforeend',
-			`<tr>
+			`<tr class='analyze-data-row'>
 			<td>${key}</td>
 			<td>${value}</td>
 		</tr>`
