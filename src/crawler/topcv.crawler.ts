@@ -93,7 +93,7 @@ export default class TopCVCrawler extends AbstractCrawler {
 			return page;
 		} catch (err) {
 			logger.error(err);
-			throw new Error(`TopCV Crawler - Fail to goto page: ${url}`);
+			throw new Error(`TopDev Crawler - Fail to goto page: ${url}`);
 		}
 	}
 
@@ -301,6 +301,7 @@ export default class TopCVCrawler extends AbstractCrawler {
 				company,
 				requiredExp
 			);
+			this.log('info',jobDetailRaw.reformat());
 			return jobDetailRaw.reformat();
 		} catch (err) {
 			logger.error(err);

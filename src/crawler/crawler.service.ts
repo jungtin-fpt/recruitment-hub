@@ -6,12 +6,14 @@ import { synchronizeSkills } from '../skill-suggestor/skill.service';
 import AbstractCrawler from './crawler.abstract';
 import TopCVCrawler from './topcv.crawler';
 import DefaultEmitter from '../emitter/default-emitter';
-
-export const topCvCrawler = new TopCVCrawler();
+import TopDevCrawler from './topdev.crawler';
 /* 
 	Mỗi một crawler sẽ sử dụng theo crawler.then().catch()
 */
-export let crawlers: AbstractCrawler[] = [topCvCrawler];
+export const topCvCrawler = new TopCVCrawler();
+export const topDevCrawler = new TopDevCrawler();
+
+export let crawlers: AbstractCrawler[] = [topDevCrawler];
 export let numOfFinishedJob = 0;
 
 export let isAvailable = true;

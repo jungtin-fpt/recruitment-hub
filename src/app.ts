@@ -4,7 +4,7 @@ import path from 'path';
 import { createConnection } from 'typeorm';
 import config from './config';
 import crawlerRouter from './crawler/crawler.route';
-import { topCvCrawler as TopCvCrawler, isAvailable } from './crawler/crawler.service';
+import { topCvCrawler as TopCvCrawler, topDevCrawler as TopDevCrawler, isAvailable } from './crawler/crawler.service';
 import logger from './logger';
 import { EmitterLogger } from './emitter/emitter-logger.types';
 import camelCaseMiddleware from './middlewares/camelcase.middleware';
@@ -37,6 +37,10 @@ app.get('/events', sse(), (req: Request, res: any) => {
 
 	TopCvCrawler.on('log', (data: EmitterLogger) => {
 		resp.sse.event('topcv-event', data);
+	});
+
+	TopDevCrawler.on('log', (data: EmitterLogger) => {
+		resp.sse.event('topdev-event', data);
 	});
 
 	DefaultEmitter.on('log', (data: EmitterLogger) => {
