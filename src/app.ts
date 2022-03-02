@@ -7,6 +7,7 @@ import crawlerRouter from './crawler/crawler.route';
 import {
 	topCvCrawler as TopCvCrawler,
 	vieclam365Crawler as Vieclam365Crawler,
+  topDevCrawler as TopDevCrawler,
 	isAvailable,
 } from './crawler/crawler.service';
 import logger from './logger';
@@ -43,7 +44,11 @@ app.get('/events', sse(), (req: Request, res: any) => {
 		resp.sse.event('topcv-event', data);
 	});
 
-	Vieclam365Crawler.on('log', (data: EmitterLogger) => {
+	TopDevCrawler.on('log', (data: EmitterLogger) => {
+		resp.sse.event('topdev-event', data);
+  });
+
+  Vieclam365Crawler.on('log', (data: EmitterLogger) => {
 		resp.sse.event('vieclam365-event', data);
 	});
 

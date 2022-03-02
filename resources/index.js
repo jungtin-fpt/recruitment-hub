@@ -16,6 +16,7 @@ export const toastContainerEl = document.getElementById('toast-container');
 export const crawlerStatusEl = document.getElementById('crawler-status__value');
 export const crawlBtnEl = document.getElementById('crawl__btn');
 export const topCvLogContainer = document.getElementById('topcv-crawler__log-container');
+export const topDevLogContainer = document.getElementById('topdev-crawler__log-container');
 export const timviec365LogContainer = document.getElementById('timviec365-crawler__log-container');
 export const kwInputEl = document.getElementById('keyword__input');
 
@@ -210,6 +211,7 @@ if (!!window.EventSource) {
 	);
 
 	source.addEventListener('topcv-event', crawlerEventFunction(topCvLogContainer), false);
+	source.addEventListener('topdev-event', crawlerEventFunction(topDevLogContainer), false);
 	source.addEventListener('vieclam365-event', crawlerEventFunction(timviec365LogContainer), false);
 
 	source.addEventListener(
