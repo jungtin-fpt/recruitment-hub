@@ -8,6 +8,7 @@ router.post(
 	'/',
 	[
 		body('keyword').notEmpty().withMessage('must be specify'),
+		body('headless').optional().isBoolean().withMessage('must be boolean'),
 	],
 	validationMiddleware,
 	crawlController

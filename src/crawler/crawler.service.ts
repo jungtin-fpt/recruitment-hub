@@ -24,14 +24,14 @@ export let crawlers: AbstractCrawler[] = [topCvCrawler, vieclam365Crawler, topDe
 export let numOfFinishedJob = 0;
 export let isAvailable = true;
 
-export async function startCrawling(keyword: string) {
+export async function startCrawling(keyword: string, headless: boolean = true) {
 	isAvailable = false;
 	DefaultEmitter.log('info', `Crawling process of keyword: ${keyword} is starting`);
 	DefaultEmitter.status(isAvailable);
 	const section = await createSection(keyword);
 	for (const crawler of crawlers) {
 		crawler
-			.crawl(keyword, false)
+			.crawl(keyword, headless)
 			.then(async (jobs) => {
 				crawler.log('info', `Crawl Finished - keyword: ${keyword}`);
 				crawler.log('info', `Synchonizing jobs...`);

@@ -28,7 +28,6 @@ export async function getSkills(isOmit?: boolean, isVerified?: boolean) {
 		order: {
 			suggests: 'DESC'
 		},
-		take: 300
 	});
 }
 
