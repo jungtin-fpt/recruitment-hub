@@ -19,6 +19,7 @@ export const topCvLogContainer = document.getElementById('topcv-crawler__log-con
 export const topDevLogContainer = document.getElementById('topdev-crawler__log-container');
 export const timviec365LogContainer = document.getElementById('timviec365-crawler__log-container');
 export const careerBuilderLogContainer = document.getElementById('careerbuilder-crawler__log-container');
+export const vietnamWorkLogContainer = document.getElementById('vietnamwork-crawler__log-container');
 export const kwInputEl = document.getElementById('keyword__input');
 
 export const exportPdfBtn = document.getElementById('export-pdf__btn');
@@ -215,6 +216,7 @@ if (!!window.EventSource) {
 	source.addEventListener('topdev-event', crawlerEventFunction(topDevLogContainer), false);
 	source.addEventListener('vieclam365-event', crawlerEventFunction(timviec365LogContainer), false);
 	source.addEventListener('careerbuilder-event', crawlerEventFunction(careerBuilderLogContainer), false);
+	source.addEventListener('vietnamwork-event', crawlerEventFunction(vietnamWorkLogContainer), false);
 
 	source.addEventListener(
 		'open',

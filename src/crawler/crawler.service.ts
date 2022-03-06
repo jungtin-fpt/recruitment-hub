@@ -10,6 +10,7 @@ import TopCVCrawler from './topcv.crawler';
 import TopDevCrawler from './topdev.crawler';
 import Vieclam365Crawler from './vieclam365.crawler';
 import CareerBuilderCrawler from './careerbuilder.crawler';
+import VietnamWorkCrawler from './vietnamwork.crawler';
 /* 
 	Mỗi một crawler sẽ sử dụng theo crawler.then().catch()
 */
@@ -17,10 +18,10 @@ export const topCvCrawler = new TopCVCrawler();
 export const topDevCrawler = new TopDevCrawler();
 export const vieclam365Crawler = new Vieclam365Crawler();
 export const careerBuilderCrawler = new CareerBuilderCrawler();
+export const vietnamWorkCrawler = new VietnamWorkCrawler();
 
-export let crawlers: AbstractCrawler[] = [topCvCrawler, vieclam365Crawler, topDevCrawler, careerBuilderCrawler];
+export let crawlers: AbstractCrawler[] = [topCvCrawler, vieclam365Crawler, topDevCrawler, careerBuilderCrawler, vietnamWorkCrawler];
 export let numOfFinishedJob = 0;
-
 export let isAvailable = true;
 
 export async function startCrawling(keyword: string) {

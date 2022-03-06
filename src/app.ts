@@ -9,6 +9,7 @@ import {
 	vieclam365Crawler as Vieclam365Crawler,
 	topDevCrawler as TopDevCrawler,
 	careerBuilderCrawler as CareerBuilderCrawler,
+	vietnamWorkCrawler as VietnamWorkCrawler,
 	isAvailable,
 } from './crawler/crawler.service';
 import logger from './logger';
@@ -55,6 +56,10 @@ app.get('/events', sse(), (req: Request, res: any) => {
 
 	CareerBuilderCrawler.on('log', (data: EmitterLogger) => {
 		resp.sse.event('careerbuilder-event', data);
+	});
+
+	VietnamWorkCrawler.on('log', (data: EmitterLogger) => {
+		resp.sse.event('vietnamwork-event', data);
 	});
 
 	DefaultEmitter.on('log', (data: EmitterLogger) => {
