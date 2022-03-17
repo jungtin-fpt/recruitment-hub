@@ -16,7 +16,7 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 	): Promise<JobDetailDTO[]> {
 		try {
 			const jobDetails: JobDetailDTO[] = [];
-			var startTime = performance.now();
+			var startTime = Date.now();
 			this.log(
 				'info',
 				`VietnamWork Crawler: has just started and crawling for keyword: ${keyword} - URL: ${baseUrl}`
@@ -57,7 +57,7 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 				}
 			}
 			await browser.close();
-			var endTime = performance.now();
+			var endTime = Date.now();
 			this.log(
 				'info',
 				`Crawling process comleted in ${Math.round((endTime - startTime) / 1000)} seconds `
@@ -79,7 +79,7 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 				headless,
 				defaultViewport: null,
 				devtools: false,
-				args: [`--window-size=${windowWidth},${windowHeight}`],
+				args: [`--window-size=${windowWidth},${windowHeight}`, '--no-sandbox', '--disable-setuid-sandbox'],
 			});
 			const context = browser.defaultBrowserContext();
 			context.overridePermissions(baseUrl, ['geolocation', 'notifications']);

@@ -1,7 +1,7 @@
 module.exports = {
 	apps: [
 		{
-			name: 'recruiment-hub',
+			name: 'hub',
 			script: './dist/app.js',
 			env: {
 				PORT: 8080,
