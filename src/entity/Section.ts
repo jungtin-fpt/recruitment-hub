@@ -26,7 +26,7 @@ export class Section extends BaseEntity {
     })
     status: SECTION_STATE;
 
-    @OneToMany(() => Job, job => job.section)
+    @OneToMany(() => Job, job => job.section, { onDelete: 'CASCADE' })
     jobs: Job[];
 
     @CreateDateColumn()

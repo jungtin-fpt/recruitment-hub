@@ -25,6 +25,7 @@ export async function getSkills(isOmit?: boolean, isVerified?: boolean) {
 			isOmit: isOmit || false,
 			isVerified: isVerified || false,
 		},
+		take: 300,
 		order: {
 			suggests: 'DESC'
 		},
