@@ -30,9 +30,9 @@ app.use(camelCaseMiddleware());
 app.use(omitEmptyMiddleware());
 
 app.get('/', (req: Request, res: Response) => {
-	res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+	res.sendFile(path.join(__dirname, '..', 'static', 'index.html'));
 });
-app.use('/static', express.static(path.resolve(__dirname, '../dist')));
+app.use('/static', express.static(path.resolve(__dirname, '../static')));
 app.use('/skills', skillRouter);
 app.use('/crawler', crawlerRouter);
 app.use('/sections', sectionRouter);
@@ -82,7 +82,24 @@ app.get('/events', sse(), (req: Request, res: any) => {
 	*/
 });
 
-createConnection().then((connection) => {
+createConnection({
+	type: 'mysql',
+	host: config.db.host,
+	port: config.db.port,
+	username: config.db.username,
+	password: config.db.password,
+	database: config.db.database,
+	entities: [config.db.entityFilter],
+	migrations: [config.db.migrationFilter],
+	subscribers: [config.db.subscriberFilter],
+	cli: {
+		entitiesDir: config.db.entitiesDir,
+		migrationsDir: config.db.migrationsDir,
+		subscribersDir: config.db.subscribersDir,
+	},
+	logging: config.db.logging,
+	synchronize: config.db.synchronize,
+}).then((connection) => {
 	logger.info(`Database Connecting: ${connection.isConnected}`);
 	app.listen(config.port, () => {
 		console.log(`Server is running on PORT: ${config.port}`);

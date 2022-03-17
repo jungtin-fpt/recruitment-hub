@@ -48,7 +48,7 @@ var config = convict.default({
 			env: 'DB_PASSWORD',
 		},
 		port: {
-			format: 'port',
+			format: Number,
 			default: 3306,
 			env: 'DB_PORT',
 		},
@@ -62,6 +62,46 @@ var config = convict.default({
 			default: {
 				bigNumberStrings: true,
 			},
+		},
+		entityFilter: {
+			format: String,
+			default: "src/entity/**/*.ts",
+			env: 'DB_ENTITY_FILTER',
+		},
+		migrationFilter: {
+			format: String,
+			default: "src/migration/**/*.ts",
+			env: 'DB_MIGRATION_FILTER',
+		},
+		subscriberFilter: {
+			format: String,
+			default: "src/subscriber/**/*.ts",
+			env: 'DB_SUBSCRIBER_FILTER',
+		},
+		entitiesDir: {
+			format: String,
+			default: "src/entity",
+			env: 'DB_ENTITIES_DIR',
+		},
+		migrationsDir: {
+			format: String,
+			default: "src/migration",
+			env: 'DB_MIGRATIONS_DIR',
+		},
+		subscribersDir: {
+			format: String,
+			default: "src/subscriber",
+			env: 'DB_SUBSCRIBERS_DIR',
+		},
+		logging: {
+			format: Boolean,
+			default: true,
+			env: 'DB_LOGGING',
+		},
+		synchronize: {
+			format: Boolean,
+			default: true,
+			env: 'DB_SYNCHRONIZE',
 		},
 	},
 

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible"
+              content="IE=edge">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0">
+        <title>Recruitement Hub</title>
+    <meta name="description" content="What description?"><script defer src="/static/main.bundle.js"></script></head>
+
+    <body class="position-relative">
+        <section id="welcome">
+            <div id="welcome__content">
+                <h1>Chào mừng đến với <span id="brand__span">Recruitement Hub</span></h1>
+                <p class="lead">Nơi bạn có thể phân tích toàn cảnh thị trường việc làm tại Việt Nam chỉ với một từ khoá
+                </p>
+                <div class="d-flex flex-row">
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           id="keyword__input">
+                    <button class="btn btn-success btn-sm"
+                            id="crawl__btn">Start Crawling</button>
+                </div>
+                <p id="crawler-status"
+                   class="mt-1 text-secondary">Crawler Status: <span id="crawler-status__value"
+                          class="text-success"></span></p>
+            </div>
+        </section>
+        <section id="crawler">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="h1 mb-4 mt-5 text-white">Crawling Process Logs</h2>
+                        <!-- Start Accordion -->
+                        <div class="accordion mb-5"
+                             id="accordion-panel-container">
+                            <!-- Item -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"
+                                    id="panel-item-heading-one">
+                                    <button class="accordion-button"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#panel-item-content-one"
+                                            aria-expanded="true"
+                                            aria-controls="panel-item-content-one">
+                                        TopCV Crawler
+                                    </button>
+                                </h2>
+                                <div id="panel-item-content-one"
+                                     class="accordion-collapse collapse show">
+                                    <div class="accordion-body"
+                                         id="topcv-crawler__log-container">
+                                    </div>
+                                </div>
+                            </div> <!-- End Item -->
+                            <!-- Item -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"
+                                    id="panel-item-heading-two">
+                                    <button class="accordion-button"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#panel-item-content-two"
+                                            aria-expanded="true"
+                                            aria-controls="panel-item-content-two">
+                                        VietnamWork Crawler
+                                    </button>
+                                </h2>
+                                <div id="panel-item-content-two"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body"
+                                         id="vietnamwork-crawler__log-container">
+                                    </div>
+                                </div>
+                            </div> <!-- End Item -->
+
+                            <!-- Item -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"
+                                    id="panel-item-heading-three">
+                                    <button class="accordion-button"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#panel-item-content-three"
+                                            aria-expanded="true"
+                                            aria-controls="panel-item-content-three">
+                                        TimViec365 Crawler
+                                    </button>
+                                </h2>
+                                <div id="panel-item-content-three"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body"
+                                         id="timviec365-crawler__log-container">
+                                    </div>
+                                </div>
+                            </div> <!-- End Item -->
+
+                            <!-- Item -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"
+                                    id="panel-item-heading-four">
+                                    <button class="accordion-button"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#panel-item-content-four"
+                                            aria-expanded="true"
+                                            aria-controls="panel-item-content-four">
+                                        CareerBuilder Crawler
+                                    </button>
+                                </h2>
+                                <div id="panel-item-content-four"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body"
+                                         id="careerbuilder-crawler__log-container">
+                                    </div>
+                                </div>
+                            </div> <!-- End Item -->
+
+                            <!-- Item -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"
+                                    id="panel-item-heading-five">
+                                    <button class="accordion-button"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#panel-item-content-five"
+                                            aria-expanded="true"
+                                            aria-controls="panel-item-content-five">
+                                        TopDev Crawler
+                                    </button>
+                                </h2>
+                                <div id="panel-item-content-five"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body"
+                                         id="topdev-crawler__log-container">
+                                    </div>
+                                </div>
+                            </div> <!-- End Item -->
+                        </div> <!-- End Accordion -->
+                    </div>
+                </div>
+        </section>
+        <section id="history">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="h1 mb-4 mt-5 text-success">Process History</h2>
+                        <table class="table table-dark table-hover mb-5"
+                               id="section__table">
+                            <tr>
+                                <th>#</th>
+                                <th>Keyword</th>
+                                <th>Status</th>
+                                <th>Jobs</th>
+                                <th>Updated At</th>
+                                <th>Created At</th>
+                                <th>Analyze and Generate Report</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="suggestion">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="h1 mb-4 mt-5 text-success">Skill Suggestion Management</h2>
+                        <div class="form-group mb-3">
+                            <label for="suggestion-status__selector"><b>Status</b></label>
+                            <select id="suggestion-status__selector">
+                                <option value="verification-required">Verification Required</option>
+                                <option value="omitted">Omitted</option>
+                                <option value="verified">Verified</option>
+                            </select>
+                        </div>
+                        <table class="table table-primary table-hover mb-5"
+                               id="suggestion__table">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Appear Times(count)</th>
+                                <th>Verify</th>
+                                <th>Omit</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Toast -->
+        <div class="toast-container"
+             id="toast-container">
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade"
+             id="modal"
+             tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-body"
+                         id="export-pdf__container">
+                        <div class="row">
+                            <div class="col-8 mx-auto mx-xl-0">
+                                <h4>Vùng miền</h4>
+                                <canvas id="regionChart"></canvas>
+                                <h4>Kĩ năng cần thiết</h4>
+                                <canvas id="skillChart"></canvas>
+                                <h4>Kĩ năng cần thiết (gợi ý bởi hệ thống phân tích)</h4>
+                                <canvas id="suggestedSkillChart"></canvas>
+                                <h4>Mức lương</h4>
+                                <canvas id="salaryChart"></canvas>
+                                <h4>Cấp bậc</h4>
+                                <canvas id="levelChart"></canvas>
+                                <h4>Phương thức làm việc</h4>
+                                <canvas id="workMethodChart"></canvas>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách công ty</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__company-table">
+                                    <tr>
+                                        <th>Tên</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách cấp bậc ứng tuyển</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__level-table">
+                                    <tr>
+                                        <th>Cấp bậc</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div> <!-- End Row -->
+
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách vùng miền</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__region-table">
+                                    <tr>
+                                        <th>Vùng miền</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách mức lương</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__salary-table">
+                                    <tr>
+                                        <th>Mức lương</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Row -->
+
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách kĩ năng</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__skill-table">
+                                    <tr>
+                                        <th>Kỹ năng</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+
+                                </table>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách kỹ năng(*phân tích bởi server từ mô tả công việc)</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__suggest-skill-table">
+                                    <tr>
+                                        <th>Kỹ năng</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Row -->
+
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h4>Danh sách hình thức làm việc</h4>
+                                <table class="table table-success table-striped"
+                                       id="analyze__work-method-table">
+                                    <tr>
+                                        <th>Hình thức làm việc</th>
+                                        <th>Số lượng công việc</th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Row -->
+
+                    </div>
+                    <!-- End Body -->
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Close</button>
+                        <button type="button"
+                                class="btn btn-primary"
+                                id="export-pdf__btn">Export PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
