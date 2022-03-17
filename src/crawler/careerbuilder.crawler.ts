@@ -1,13 +1,15 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { CompanyDTO } from '../company/company.dto';
+import config from '../config';
 import { JobDetailCareerBuilderDTO } from '../job/job-detail-careerbuilder.dto';
 import { JobDetailDTO } from '../job/job-detail.dto';
 import { JobOverallDTO } from '../job/job-overall.dto';
 import logger from '../logger';
 import AbstractCrawler from './crawler.abstract';
+import { getLaunchBrowserOption } from './crawler.helper';
 
 export default class CareerBuilderCrawler extends AbstractCrawler {
-    async crawl(
+	async crawl(
 		keyword: string,
 		headless: boolean = true,
 		baseUrl: string = 'https://careerbuilder.vn',
@@ -15,33 +17,42 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 	): Promise<JobDetailDTO[]> {
 		try {
 			const jobDetails: JobDetailDTO[] = [];
-            //
-            var startTime = Date.now();
-			this.log('info', `CareerBuilder Crawler: has just started and crawling for keyword: ${keyword} - URL: ${baseUrl}`);
+			//
+			var startTime = Date.now();
+			this.log(
+				'info',
+				`CareerBuilder Crawler: has just started and crawling for keyword: ${keyword} - URL: ${baseUrl}`
+			);
 
-            const browser = await this.launchBrowser(baseUrl, headless);
-            let page = await this.goto(browser, `https://careerbuilder.vn/viec-lam/${keyword}-k-vi.html`);
-            const jobs = await this.crawlAllJobs(page);
-            //
+			const browser = await this.launchBrowser(baseUrl, headless);
+			let page = await this.goto(browser, `https://careerbuilder.vn/viec-lam/${keyword}-k-vi.html`);
+			const jobs = await this.crawlAllJobs(page);
+			//
 			for (let i = 0; i < jobs.length; i++) {
 				const job: JobOverallDTO = jobs[i];
 				try {
 					page = await this.goto(browser, job.url, page);
 					let detail!: JobDetailDTO;
 					detail = await this.crawlJobDetail(page, job, keyword);
-		
+
 					if (detail) {
 						this.log('info', 'Job crawling completed successfully:');
 						this.log('info', detail);
 						jobDetails.push(detail);
 					}
 				} catch (err) {
-					this.log('error', `CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
+					this.log(
+						'error',
+						`CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`
+					);
 				}
 			}
 			await browser.close();
 			var endTime = Date.now();
-			this.log('info', `Crawling process comleted in ${Math.round((endTime - startTime) / 1000)} seconds `);
+			this.log(
+				'info',
+				`Crawling process comleted in ${Math.round((endTime - startTime) / 1000)} seconds `
+			);
 			//
 			return jobDetails;
 		} catch (err) {
@@ -50,19 +61,16 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		}
 	}
 
-    async launchBrowser(
+	async launchBrowser(
 		baseUrl: string,
 		headless: boolean = false,
 		windowWidth: number = 1200,
 		windowHeight: number = 800
 	): Promise<Browser> {
 		try {
-			const browser = await puppeteer.launch({
-				headless,
-				defaultViewport: null,
-				devtools: false,
-				args: [`--window-size=${windowWidth},${windowHeight}`, '--no-sandbox', '--disable-setuid-sandbox'],
-			});
+			const browser = await puppeteer.launch(
+				getLaunchBrowserOption(config.env, windowWidth, windowHeight, headless)
+			);
 			const context = browser.defaultBrowserContext();
 			context.overridePermissions(baseUrl, ['geolocation', 'notifications']);
 
@@ -74,7 +82,7 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		}
 	}
 
-    async goto(browser: Browser, url: string, page?: Page): Promise<Page> {
+	async goto(browser: Browser, url: string, page?: Page): Promise<Page> {
 		try {
 			if (!page) page = await browser.newPage();
 			await page.goto(url, { waitUntil: 'networkidle2' });
@@ -86,7 +94,7 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		}
 	}
 
-    async crawlAllJobs(page: Page): Promise<JobOverallDTO[]> {
+	async crawlAllJobs(page: Page): Promise<JobOverallDTO[]> {
 		try {
 			let isNextPage = false;
 			const arrJobs: JobOverallDTO[] = [];
@@ -135,7 +143,7 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 					nextPageEl = await pagination.$('li:last-child');
 					if (!nextPageEl) throw new Error('Không tìm thấy next page');
 
-					isNextPage = (await nextPageEl.evaluate((el) => el.classList.contains('next-page')));
+					isNextPage = await nextPageEl.evaluate((el) => el.classList.contains('next-page'));
 				}
 
 				if (isNextPage && nextPageEl) await nextPageEl.click();
@@ -154,17 +162,30 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		try {
 			await page.waitForSelector('h1.title');
 			const companyLink =
-				(await page.$eval('body > main > section.search-result-list-detail.template-2 > div > div > div.col-12.mb-15 > section > div.apply-now-content > div.job-desc > a', (el) =>
-					(el as HTMLElement).getAttribute('href')
+				(await page.$eval(
+					'body > main > section.search-result-list-detail.template-2 > div > div > div.col-12.mb-15 > section > div.apply-now-content > div.job-desc > a',
+					(el) => (el as HTMLElement).getAttribute('href')
 				)) || '';
-			const region = await page.$eval('#tab-1 > section > div.bg-blue > div > div:nth-child(1) > div > div > p > a', (el) => (el as HTMLElement).innerText);
+			const region = await page.$eval(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(1) > div > div > p > a',
+				(el) => (el as HTMLElement).innerText
+			);
 			const workAddress = region;
-			const salary = await page.$eval('#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(1) > p', (el) => (el as HTMLElement).innerText);
-			const level = await page.$eval('#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(3) > p', (el) => (el as HTMLElement).innerText);
-			const workMethod = await page.$eval('#tab-1 > section > div.bg-blue > div > div:nth-child(2) > div > ul > li:nth-child(3) > p', (el) => (el as HTMLElement).innerText);
-			const skills:string[] = [keyword];
+			const salary = await page.$eval(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(1) > p',
+				(el) => (el as HTMLElement).innerText
+			);
+			const level = await page.$eval(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(3) > p',
+				(el) => (el as HTMLElement).innerText
+			);
+			const workMethod = await page.$eval(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(2) > div > ul > li:nth-child(3) > p',
+				(el) => (el as HTMLElement).innerText
+			);
+			const skills: string[] = [keyword];
 			// const description = '';
-			const description = 
+			const description =
 				(await page.$$eval('h3.detail-title', (els) => {
 					const el = (els as HTMLElement[]).filter(
 						(title) => title.innerHTML === 'Yêu Cầu Công Việc'
@@ -190,10 +211,11 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 			// 	return els.map(el => el.innerHTML);
 			// });
 			// console.log(descEl);
-			
 
-
-			const requiredExp = await page.$eval('#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(2) > p', (el) => (el as HTMLElement).innerText);
+			const requiredExp = await page.$eval(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(3) > div > ul > li:nth-child(2) > p',
+				(el) => (el as HTMLElement).innerText
+			);
 
 			const company = await this.crawlCompany(page, companyLink);
 			const jobDetailRaw = new JobDetailCareerBuilderDTO(
@@ -212,15 +234,23 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 			return jobDetailRaw.reformat();
 		} catch (err) {
 			logger.error(err);
-			this.log('error', `CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`, true);
-			throw new Error(`CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
+			this.log(
+				'error',
+				`CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`,
+				true
+			);
+			throw new Error(
+				`CareerBuilder Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`
+			);
 		}
 	}
 
 	async crawlCompany(page: Page, companyLink: string): Promise<CompanyDTO> {
 		try {
 			await page.goto(companyLink);
-			await page.waitForSelector('body > main > section > div > div.company-introduction > div.company-info > div > div.content > p.name');
+			await page.waitForSelector(
+				'body > main > section > div > div.company-introduction > div.company-info > div > div.content > p.name'
+			);
 			const companyName = await page.$eval(
 				'body > main > section > div > div.company-introduction > div.company-info > div > div.content > p.name',
 				(el) => (el as HTMLElement).innerText
@@ -230,8 +260,9 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 				(el) => (el as HTMLElement).innerText
 			);
 			const companyImageUrl =
-				(await page.$eval('body > main > section > div > div.company-introduction > div.company-info > div > div.img > img', (el) =>
-					(el as HTMLElement).getAttribute('src')
+				(await page.$eval(
+					'body > main > section > div > div.company-introduction > div.company-info > div > div.img > img',
+					(el) => (el as HTMLElement).getAttribute('src')
 				)) || '';
 			// await page.close();
 
@@ -245,10 +276,15 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 
 	async getWorkAddress(page: Page) {
 		try {
-			const address = await page.$('#tab-1 > section > div.bg-blue > div > div:nth-child(1) > div > div > a > img');
+			const address = await page.$(
+				'#tab-1 > section > div.bg-blue > div > div:nth-child(1) > div > div > a > img'
+			);
 			address?.click;
-			
-			return await page.$eval('#maps-tab-1 > div.box-local > div.content > ul > li > a', (el) => (el as HTMLElement).innerText);
+
+			return await page.$eval(
+				'#maps-tab-1 > div.box-local > div.content > ul > li > a',
+				(el) => (el as HTMLElement).innerText
+			);
 		} catch (err) {
 			logger.error(err);
 			throw new Error(`CareerBuilder Crawler - Fail to crawl address`);

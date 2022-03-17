@@ -1,13 +1,15 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { CompanyDTO } from '../company/company.dto';
+import config from '../config';
 import { JobDetailViecLam365DTO } from '../job/job-detail-vieclam365.dto';
 import { JobDetailDTO } from '../job/job-detail.dto';
 import { JobOverallDTO } from '../job/job-overall.dto';
 import logger from '../logger';
 import AbstractCrawler from './crawler.abstract';
+import { getLaunchBrowserOption } from './crawler.helper';
 
 export default class Vieclam365Crawler extends AbstractCrawler {
-    async crawl(
+	async crawl(
 		keyword: string,
 		headless: boolean = true,
 		baseUrl: string = 'https://timviec365.vn/',
@@ -15,22 +17,25 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		//searchUrl: string = 'https://timviec365.vn/tin-tuyen-dung-viec-lam.html'
 	): Promise<JobDetailDTO[]> {
 		try {
-			 const jobDetails: JobDetailDTO[] = [];
-			 var startTime = Date.now();
-			 this.log('info', `Vieclam365 Crawler: has just started and crawling for keyword: ${keyword} - URL: ${baseUrl}`);
-			
-			 const browser = await this.launchBrowser(baseUrl, headless);
-			 let page = await this.goto(browser, searchUrl);
-			 page = await this.search(page, keyword);
-			 //const totalPage = await this.getTotalPageNumber(page);
-			 //const totalPage = 12;
-			 const jobs = await this.crawlAllJobs(page);
+			const jobDetails: JobDetailDTO[] = [];
+			var startTime = Date.now();
+			this.log(
+				'info',
+				`Vieclam365 Crawler: has just started and crawling for keyword: ${keyword} - URL: ${baseUrl}`
+			);
+
+			const browser = await this.launchBrowser(baseUrl, headless);
+			let page = await this.goto(browser, searchUrl);
+			page = await this.search(page, keyword);
+			//const totalPage = await this.getTotalPageNumber(page);
+			//const totalPage = 12;
+			const jobs = await this.crawlAllJobs(page);
 			for (let i = 0; i < jobs.length; i++) {
 				const job: JobOverallDTO = jobs[i];
 				try {
 					page = await this.goto(browser, job.url, page);
 					let detail!: JobDetailDTO;
-					detail = await this.crawlJobDetail(keyword ,page, job);
+					detail = await this.crawlJobDetail(keyword, page, job);
 					// else if (job.url.includes('topcv.vn/brand'))
 					// 	detail = await this.crawlJobDetailForBrandPage(page, job);
 
@@ -40,32 +45,35 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 						jobDetails.push(detail);
 					}
 				} catch (err) {
-					this.log('error', `TimViec365 Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
+					this.log(
+						'error',
+						`TimViec365 Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`
+					);
 				}
 			}
-			 await browser.close();
-			 var endTime = Date.now();
-			 this.log('info', `Crawling process comleted in ${Math.round((endTime - startTime) / 1000)} seconds `);
-			 return jobDetails;
+			await browser.close();
+			var endTime = Date.now();
+			this.log(
+				'info',
+				`Crawling process comleted in ${Math.round((endTime - startTime) / 1000)} seconds `
+			);
+			return jobDetails;
 		} catch (err) {
 			logger.error(err);
 			throw new Error(`Error when crawling website: ${baseUrl} - ${searchUrl}`);
 		}
 	}
 
-    async launchBrowser(
+	async launchBrowser(
 		baseUrl: string,
 		headless: boolean = false,
 		windowWidth: number = 1200,
 		windowHeight: number = 800
 	): Promise<Browser> {
 		try {
-			const browser = await puppeteer.launch({
-				headless,
-				defaultViewport: null,
-				devtools: false,
-				args: [`--window-size=${windowWidth},${windowHeight}`, '--no-sandbox', '--disable-setuid-sandbox'],
-			});
+			const browser = await puppeteer.launch(
+				getLaunchBrowserOption(config.env, windowWidth, windowHeight, headless)
+			);
 			const context = browser.defaultBrowserContext();
 			context.overridePermissions(baseUrl, ['geolocation', 'notifications']);
 
@@ -77,8 +85,7 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		}
 	}
 
-
-    async goto(browser: Browser, url: string, page?: Page): Promise<Page> {
+	async goto(browser: Browser, url: string, page?: Page): Promise<Page> {
 		try {
 			if (!page) page = await browser.newPage();
 			await page.goto(url, { waitUntil: 'networkidle2' });
@@ -90,7 +97,7 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		}
 	}
 
-    async search(page: Page, keyword: string): Promise<Page> {
+	async search(page: Page, keyword: string): Promise<Page> {
 		try {
 			await page.waitForSelector('input#fts_id');
 			await page.type('input#fts_id', keyword);
@@ -107,7 +114,6 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		}
 	}
 
-
 	async getTotalPageNumber(page: Page): Promise<number> {
 		try {
 			await page.waitForSelector('div.pagination_wrap');
@@ -115,20 +121,19 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			//const totalPages = await page.$('div.pagination_wrap div.clr a.next');
 			if (pagination) {
 				//let totalPage = 1;
-			
+
 				const lastItems = await pagination.$('a:last-child');
 				await lastItems?.click();
 				await page.waitForSelector('div.pagination_wrap div.clr');
 				const paginationTmp = await page.$('div.pagination_wrap div.clr');
 				const lastPageEl = await paginationTmp?.$('a.jp-current');
-				if(lastPageEl){
+				if (lastPageEl) {
 					return Number.parseInt(await lastPageEl.evaluate((el) => (el as HTMLElement).innerText));
 				}
-				
 
 				// const lastPageEl = listItems[listItems.length - 2];
 				// return Number.parseInt(await lastPageEl.evaluate((el) => (el as HTMLElement).innerText));
-				
+
 				// while(await page.$('div.pagination_wrap div.clr a.next')){
 				// 	await page.click('div.pagination_wrap div.clr a.next');
 				// 	totalPage ++;
@@ -143,16 +148,14 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		}
 	}
 
-	async goNextPage(){
-
-	}
+	async goNextPage() {}
 
 	async crawlAllJobs(page: Page, totalPage?: number): Promise<JobOverallDTO[]> {
 		try {
 			let isNextPage = false;
 			const arrJobs: JobOverallDTO[] = [];
 			let currentPage: string | undefined;
-			
+
 			const isEmptyEl = await page.$('div.pagination_wrap div.clr a');
 			const checkNull = await isEmptyEl?.evaluate((el) => (el as HTMLElement).innerText);
 			if (checkNull === '') {
@@ -173,49 +176,46 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 
 				const jobs = await page.$$('div.item_cate');
 				this.log('info', `Crawl All Job - Page ${currentPage} - Total: ${jobs.length} jobs`);
-				
+
 				const jobInfos = await Promise.all(
 					jobs.map(async (job) => {
 						const jobInfo = await job.evaluate((el) => {
-							const baseURL : string = 'https://timviec365.vn'
+							const baseURL: string = 'https://timviec365.vn';
 							const wrapperEl = el.querySelector('div.center_cate_l h3');
 							const urlEl = wrapperEl?.querySelector('a.title_cate');
 							const titleEl = wrapperEl?.querySelector('a.title_cate');
 
-							const url =  urlEl ?(baseURL + urlEl.getAttribute('href')) : '';
+							const url = urlEl ? baseURL + urlEl.getAttribute('href') : '';
 							const title = titleEl ? titleEl.getAttribute('title') : '';
 
 							// return new Job(url, title);
 							return { url, title } as JobOverallDTO;
 						});
 						console.log(jobInfo);
-						
+
 						this.log('info', jobInfo);
 						return jobInfo;
 					})
 				);
 
 				arrJobs.push(...jobInfos);
-				
+
 				let nextBtnEl;
-				if(pagination){
-					try{
-						nextBtnEl = (await pagination.$('a.next'));
+				if (pagination) {
+					try {
+						nextBtnEl = await pagination.$('a.next');
 						if (!nextBtnEl) throw new Error('Không tìm thấy next page');
-						isNextPage = (await nextBtnEl.evaluate((el) => (((el.classList.contains('next'))))));
-					}catch {
+						isNextPage = await nextBtnEl.evaluate((el) => el.classList.contains('next'));
+					} catch {
 						isNextPage = false;
 					}
 				}
-				
-				if(nextBtnEl && isNextPage) {
-					const data = await nextBtnEl.evaluate(e => e.getAttribute('href'));
-					console.log(data);
-					if(data)
-						await page.goto('https://timviec365.vn' + data);
-					
-				}
 
+				if (nextBtnEl && isNextPage) {
+					const data = await nextBtnEl.evaluate((e) => e.getAttribute('href'));
+					console.log(data);
+					if (data) await page.goto('https://timviec365.vn' + data);
+				}
 
 				// let nextPageEl;
 				// if (pagination) {
@@ -243,34 +243,38 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 		}
 	}
 
-	async crawlJobDetail(keyword: string,page: Page, job: JobOverallDTO): Promise<JobDetailDTO> {
+	async crawlJobDetail(keyword: string, page: Page, job: JobOverallDTO): Promise<JobDetailDTO> {
 		try {
 			await page.waitForSelector('div.box_tit_detail');
-			const companyLinkTmp = 
+			const companyLinkTmp =
 				(await page.$eval('div.left_tit a.ct_com', (el) =>
 					(el as HTMLElement).getAttribute('href')
 				)) || '';
 			let companyLink = '';
-			if(companyLinkTmp !== ''){
+			if (companyLinkTmp !== '') {
 				companyLink = 'https://timviec365.vn' + companyLinkTmp;
 			}
 			const region = await page.$eval('p.dd_tuyen a', (el) => (el as HTMLElement).innerText);
-			const workAddress = (await page.$eval(
-				'div.right_tit p:nth-child(6) span',
-				(el) => (el as HTMLElement).innerText
-			)) || '';
-			const salary = (await page.$eval(
+			const workAddress =
+				(await page.$eval(
+					'div.right_tit p:nth-child(6) span',
+					(el) => (el as HTMLElement).innerText
+				)) || '';
+			const salary =
+				(await page.$eval(
 					'div.right_tit_2 p.lv_luong span',
 					(el) => (el as HTMLElement).innerText
 				)) || '';
-			const level = (await page.$eval(
-				'div.box_tomtat_2 p:first-child span',
-				(el) => (el as HTMLElement).innerText
-			)) || '';
-			const workMethod = (await page.$eval(
-				'div.box_tomtat_2 p:nth-child(3) span',
-				(el) => (el as HTMLElement).innerText
-			)) || '';
+			const level =
+				(await page.$eval(
+					'div.box_tomtat_2 p:first-child span',
+					(el) => (el as HTMLElement).innerText
+				)) || '';
+			const workMethod =
+				(await page.$eval(
+					'div.box_tomtat_2 p:nth-child(3) span',
+					(el) => (el as HTMLElement).innerText
+				)) || '';
 			// const skills = await page.$$eval('div.skill span', (els) => {
 			// 	return (els as HTMLElement[])
 			// 		.filter((el) => {
@@ -281,12 +285,10 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			// 		});
 			// });
 			const skills: string[] = [keyword];
-			const description = (await page.$eval(
-				'div.box_yeucau',
-				(el) => (el as HTMLElement).innerText
-			)) || '';
-			
-			//const descriptionTmp2 = descriptionTmp1.split('\n');			
+			const description =
+				(await page.$eval('div.box_yeucau', (el) => (el as HTMLElement).innerText)) || '';
+
+			//const descriptionTmp2 = descriptionTmp1.split('\n');
 			// const description =
 			// 	(await page.$eval('div.job-data h3', (els) => {
 			// 		const el = (els as HTMLElement[]).filter(
@@ -305,10 +307,10 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			// 		return description;
 			// 	})) || '';
 			const requiredExp =
-						(await page.$eval(
-							'div.box_tomtat_2 p:nth-child(2) span',
-							(el) => (el as HTMLElement).innerText
-						)) || '';
+				(await page.$eval(
+					'div.box_tomtat_2 p:nth-child(2) span',
+					(el) => (el as HTMLElement).innerText
+				)) || '';
 
 			// console.log(`Job title: ${job.title}`);
 			// console.log(`Job link: ${job.url}`);
@@ -340,7 +342,11 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 			return jobDetailRaw.reformat();
 		} catch (err) {
 			logger.error(err);
-			this.log('error', `TimViec365 Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`, true);
+			this.log(
+				'error',
+				`TimViec365 Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`,
+				true
+			);
 			throw new Error(`TimViec365 Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
 		}
 	}
@@ -358,9 +364,8 @@ export default class Vieclam365Crawler extends AbstractCrawler {
 				(el) => (el as HTMLElement).innerText
 			);
 			const companyImageUrl =
-				(await page.$eval('div.anh_cty a img', (el) =>
-					(el as HTMLElement).getAttribute('src')
-				)) || '';
+				(await page.$eval('div.anh_cty a img', (el) => (el as HTMLElement).getAttribute('src'))) ||
+				'';
 			// await page.close();
 
 			return new CompanyDTO(companyLink, companyName, companyAddress, companyImageUrl);

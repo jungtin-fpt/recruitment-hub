@@ -1,11 +1,13 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { CompanyDTO } from '../company/company.dto';
+import config from '../config';
 import { JobDetailVietnamWorkDTO } from '../job/job-detail-vietnamwork.dto';
 import { JobDetailDTO } from '../job/job-detail.dto';
 import { JobOverallDTO } from '../job/job-overall.dto';
 import { WORK_METHOD } from '../job/utils/work-method';
 import logger from '../logger';
 import AbstractCrawler from './crawler.abstract';
+import { getLaunchBrowserOption } from './crawler.helper';
 
 export default class VietnamWorkCrawler extends AbstractCrawler {
 	async crawl(
@@ -53,7 +55,10 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 						jobDetails.push(detail);
 					}
 				} catch (err) {
-					this.log('error', `VietnamWork Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`);
+					this.log(
+						'error',
+						`VietnamWork Crawler - Fail to crawl job detail: ${job.title} - ${job.url}`
+					);
 				}
 			}
 			await browser.close();
@@ -75,12 +80,9 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 		windowHeight: number = 800
 	): Promise<Browser> {
 		try {
-			const browser = await puppeteer.launch({
-				headless,
-				defaultViewport: null,
-				devtools: false,
-				args: [`--window-size=${windowWidth},${windowHeight}`, '--no-sandbox', '--disable-setuid-sandbox'],
-			});
+			const browser = await puppeteer.launch(
+				getLaunchBrowserOption(config.env, windowWidth, windowHeight, headless)
+			);
 			const context = browser.defaultBrowserContext();
 			context.overridePermissions(baseUrl, ['geolocation', 'notifications']);
 
@@ -237,7 +239,7 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 			// console.log(`Description: ${description}`);
 
 			const company = await this.crawlCompany(page, companyLink);
-			const jobDetailRaw = new JobDetailVietnamWorkDTO 	(
+			const jobDetailRaw = new JobDetailVietnamWorkDTO(
 				job.url,
 				job.title,
 				description,

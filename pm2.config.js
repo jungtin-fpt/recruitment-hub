@@ -5,6 +5,8 @@ module.exports = {
 			script: './dist/app.js',
 			env: {
 				PORT: 8080,
+				NODE_ENV: 'production', 
+				
 				DB_DATABASE: 'rhub',
 				DB_HOSTNAME: 'localhost',
 				DB_USERNAME: 'root',

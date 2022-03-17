@@ -1,10 +1,12 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { CompanyDTO } from '../company/company.dto';
+import config from '../config';
 import { JobDetailTopCvDTO } from '../job/job-detail-topcv.dto';
 import { JobDetailDTO } from '../job/job-detail.dto';
 import { JobOverallDTO } from '../job/job-overall.dto';
 import logger from '../logger';
 import AbstractCrawler from './crawler.abstract';
+import { getLaunchBrowserOption } from './crawler.helper';
 
 export default class TopCVCrawler extends AbstractCrawler {
 	async crawl(
@@ -63,12 +65,7 @@ export default class TopCVCrawler extends AbstractCrawler {
 		windowHeight: number = 800
 	): Promise<Browser> {
 		try {
-			const browser = await puppeteer.launch({
-				headless,
-				defaultViewport: null,
-				devtools: false,
-				args: [`--window-size=${windowWidth},${windowHeight}`, '--no-sandbox', '--disable-setuid-sandbox'],
-			});
+			const browser = await puppeteer.launch(getLaunchBrowserOption(config.env, windowWidth, windowHeight, headless));
 			const context = browser.defaultBrowserContext();
 			context.overridePermissions(baseUrl, ['geolocation', 'notifications']);
 
