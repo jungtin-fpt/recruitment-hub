@@ -13,7 +13,7 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		keyword: string,
 		headless: boolean = true,
 		baseUrl: string = 'https://careerbuilder.vn',
-		searchUrl: string = 'https://careerbuilder.vn'
+		searchUrl: string = 'https://careerbuilder.vn/viec-lam/tat-ca-viec-lam-vi.html'
 	): Promise<JobDetailDTO[]> {
 		try {
 			const jobDetails: JobDetailDTO[] = [];
@@ -25,7 +25,9 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 			);
 
 			const browser = await this.launchBrowser(baseUrl, headless);
-			let page = await this.goto(browser, `https://careerbuilder.vn/viec-lam/${keyword}-k-vi.html`);
+			let page = await this.goto(browser, searchUrl);
+			page = await this.search(page, keyword);
+
 			const jobs = await this.crawlAllJobs(page);
 			//
 			for (let i = 0; i < jobs.length; i++) {
@@ -91,6 +93,23 @@ export default class CareerBuilderCrawler extends AbstractCrawler {
 		} catch (err) {
 			logger.error(err);
 			throw new Error(`CareerBuilder Crawler - Fail to goto page: ${url}`);
+		}
+	}
+
+	async search(page: Page, keyword: string): Promise<Page> {
+		try {
+			await page.waitForSelector('input#keyword');
+			await page.type('input#keyword', keyword);
+			await page.keyboard.press('Enter');
+			await page.waitForNavigation({
+				waitUntil: 'networkidle2',
+			});
+
+			this.log('info', `Searching: ${keyword}`);
+			return page;
+		} catch (err) {
+			logger.error(err);
+			throw new Error(`TopCV Crawler - Fail to search: ${keyword}`);
 		}
 	}
 

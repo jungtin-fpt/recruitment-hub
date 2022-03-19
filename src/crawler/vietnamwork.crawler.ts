@@ -14,7 +14,7 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 		keyword: string,
 		headless: boolean = true,
 		baseUrl: string = 'https://www.vietnamworks.com',
-		searchUrl: string = 'https://www.vietnamworks.com'
+		searchUrl: string = 'https://www.vietnamworks.com/tim-viec-lam/tat-ca-viec-lam'
 	): Promise<JobDetailDTO[]> {
 		try {
 			const jobDetails: JobDetailDTO[] = [];
@@ -107,12 +107,13 @@ export default class VietnamWorkCrawler extends AbstractCrawler {
 
 	async search(page: Page, keyword: string): Promise<Page> {
 		try {
-			await page.waitForSelector('input#search-bar-input');
-			await (await page.$('input#search-bar-input'))?.type(keyword);
+			await page.waitForSelector('input#main-search-bar');
+			await (await page.$('input#main-search-bar'))?.type(keyword);
 			await page.keyboard.press('Enter');
-			await page.waitForNavigation({
-				waitUntil: 'networkidle2',
-			});
+			// await page.waitForNavigation({
+			// 	waitUntil: 'networkidle2',
+			// });
+			await page.waitForTimeout(5000);
 
 			this.log('info', `Searching: ${keyword}`);
 			return page;
