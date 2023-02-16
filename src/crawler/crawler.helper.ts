@@ -6,7 +6,7 @@ export const getLaunchBrowserOption = function (
 ) {
 	if (env === 'production')
 		return {
-			executablePath: '/usr/bin/chromium-browser',
+			executablePath: '/usr/bin/chromium',
 			headless,
 			defaultViewport: null,
 			devtools: false,
